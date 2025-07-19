@@ -1,0 +1,38 @@
+name: Classification Train Model with Docker
+
+on:
+  push:
+    branches:
+      - classification_branch
+    paths-ignore:
+      - '**/main/**'
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Step 1- Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Step 2- Build Docker image
+        run: |
+          docker build -t train-pipeline .
+
+      - name: Step 3- Run training inside Docker
+        run: |
+          docker run --name train-job train-pipeline
+
+      - name: Step 4- Copy model from container
+        run: |
+          docker cp train-job:/app/model_train.pkl ./model_train.pkl
+
+      - name: Step 5- Cleanup container
+        run: |
+          docker rm train-job
+
+      - name: Step 6- Upload model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trained-model
+          path: model_train.pkl
