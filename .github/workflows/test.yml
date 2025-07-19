@@ -1,0 +1,29 @@
+name: Run Pytest in Docker
+
+on:
+  push:
+    branches:
+      - test_branch
+    paths-ignore:
+      - '**/main/**'
+      - '**/classification_branch/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Step 1- Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Step 2- Build Docker image for testing
+        run: |
+          docker build -t test-pipeline .
+
+      - name: Step 3- Run Pytest in container
+        run: |
+          docker run --name test-container -e PYTHONPATH=/app test-pipeline pytest tests/
+
+      - name: Step 4- Clean up container
+        run: |
+          docker rm test-container

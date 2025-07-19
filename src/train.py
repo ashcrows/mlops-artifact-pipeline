@@ -21,7 +21,7 @@ def train_model(config_path: str):
             C=config["C"],
             solver=config["solver"],
             max_iter=config["max_iter"],
-            multi_class='auto'
+            multi_class='multinomial'
         )
         model.fit(X_train, y_train)
         print("Model trained successfully")
