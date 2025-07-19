@@ -1,0 +1,7 @@
+{
+  "penalty": "l2",
+  "C": 1.0,
+  "solver": "lbfgs",
+  "max_iter": 200,
+  "model_output_path": "model_train.pkl"
+}
