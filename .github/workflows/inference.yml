@@ -1,0 +1,83 @@
+name: Full CI Pipeline with Docker
+
+on:
+  push:
+    branches:
+      - inference_branch
+    paths-ignore:
+      - '**/main/**'
+      - '**/classification_branch/**'
+      - '**/test_branch/**'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**/classification_branch/**'
+      - '**/test_branch/**'
+      - '**/inference_branch/**'
+
+jobs:
+
+  test:
+    name: Run Tests in Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Step 1- Checkout code
+        uses: actions/checkout@v3
+
+      - name: Step 2- Build Docker image
+        run: docker build -t mlops-pipeline .
+
+      - name: Step 3- Run Pytest inside container
+        run: |
+          docker run --rm mlops-pipeline "pytest -v tests"
+
+  train:
+    name: Train Model in Docker
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Step 1- Checkout code
+        uses: actions/checkout@v3
+
+      - name: Step 2- Build Docker image
+        run: docker build -t mlops-pipeline .
+
+      - name: Step 3- Train model inside container
+        run: |
+          docker run --name training-container mlops-pipeline "python src/train.py"
+
+      - name: Step 4- Copy model out of container
+        run: |
+          docker cp training-container:/app/model_train.pkl model_train.pkl
+          docker rm training-container
+
+      - name: Step 5- Upload model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trained-model
+          path: model_train.pkl
+
+  inference:
+    name: Inference in Docker
+    runs-on: ubuntu-latest
+    needs: train
+
+    steps:
+      - name: Step 1- Checkout code
+        uses: actions/checkout@v3
+
+      - name: Step 2- Download model artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: trained-model
+          path: .
+
+      - name: Step 3- Build Docker image
+        run: docker build -t mlops-pipeline .
+
+      - name: Step 4- Run inference inside container
+        run: |
+          docker run --rm -v "$PWD:/app" mlops-pipeline "python src/inference.py"
