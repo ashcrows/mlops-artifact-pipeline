@@ -3,9 +3,10 @@ name: Classification Train Model with Docker
 on:
   push:
     branches:
-      - classification_branch
+      - test_branch
     paths-ignore:
       - '**/main/**'
+      - '**/classification_bran/**'
 
 jobs:
   train:
