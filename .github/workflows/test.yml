@@ -22,7 +22,7 @@ jobs:
 
       - name: Step 3- Run Pytest in container
         run: |
-          docker run --name test-container -e PYTHONPATH=/app test-pipeline pytest tests/
+          docker run --name test-container -e PYTHONPATH=/app test-pipeline pytest -v tests/
 
       - name: Step 4- Clean up container
         run: |
