@@ -75,8 +75,7 @@ This performance evaluation is embedded in the **GitHub Actions pipeline** as a 
 | File Name         | Description                          |
 |-------------------|--------------------------------------|
 | `model_train.pkl` | Trained Logistic Regression model    |
-| `report.txt`      | CLI report (optional log file)       |
-| `performance_report.md` | This report                   |
+| `performance_report.md` | This report                    |
 
 ---
 
